@@ -19,10 +19,59 @@ public class Hospital {
 			} else {
 				System.out.println("error creating table medic");
 			}
+			if (!hospital.checkIfMedicExists(url, user, pass, "John Doe")) {
+				hospital.insertMedic(url, user, pass, "John Doe", "Cardiologist", "2019-01-01");
+			}
+			if (!hospital.checkIfMedicExists(url, user, pass, "Jane Doe")) {
+				hospital.insertMedic(url, user, pass, "Jane Doe", "Neurologist", "2021-04-01");
+			}
+			if (!hospital.checkIfMedicExists(url, user, pass, "Jack Doe")) {
+				hospital.insertMedic(url, user, pass, "Jack Doe", "Orthopedist", "2023-02-01");
+			}
+			if (!hospital.checkIfMedicExists(url, user, pass, "Max Mustermann")) {
+				hospital.insertMedic(url, user, pass, "Max Mustermann", "Pediatrician", "2020-03-01");
+			}
 
 		} catch (Exception e) {
 				System.out.println("error loading driver: " + e.getMessage());
 		}}
+
+	private boolean checkIfMedicExists(String url, String user, String pass, String name) {
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection(url, user, pass);
+			Statement stmt = conn.createStatement();
+			String query = "SELECT * FROM medic WHERE name = '" + name + "';";
+			System.out.println("check medic: " + query);
+			boolean exists = stmt.executeQuery(query).next();
+			conn.close();
+			return exists;
+		} catch (SQLException e) {
+			System.out.println("error checking medic: " + e.getMessage());
+		}
+		return false;
+	}
+
+	private void insertMedic(String url, String user, String pass,
+							 String name, String specialization, String emp_date) {
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection(url, user, pass);
+			Statement stmt = conn.createStatement();
+			String query = "INSERT INTO medic (name, specialization, emp_date) " +
+					"VALUES ('" + name + "', '"+ specialization +"', '" + emp_date + "');";
+			System.out.println("insert medic: " + query);
+			int err = stmt.executeUpdate(query);
+			if (err != 0) {
+				System.out.println("medic inserted successfully");
+			} else {
+				System.out.println("error inserting medic");
+			}
+			conn.close();
+		} catch (SQLException e) {
+			System.out.println("error inserting medic: " + e.getMessage());
+		}
+	}
 
 	private int createTableMedic(String url, String user, String pass)
 			throws SQLException {
